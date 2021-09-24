@@ -1,0 +1,148 @@
+{
+	"_version": "1.0.0",
+	"sap.app": {
+		"id": "z.suek.app",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": {
+			"viewName": "z.suek.app.view.App",
+			"type": "XML",
+			"async": true,
+			"id": "app"
+		},
+		"dependencies": {
+			"minUI5Version": "1.60.6",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {},
+				"sap.ui.layout": {},
+				"sap.f": {},
+				"sap.ui.comp":{},
+				"sap.ui.table":{}
+			}
+        },
+		"resources": {
+			"css": [{
+				"uri": "css/style.css"
+			}]
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "z.suek.app.i18n.i18n"
+				}
+			},
+			"local": {
+				"type": "sap.ui.model.json.JSONModel",
+				"settings":{
+					"columns":[{
+						"label": "{{task}}",
+						"field": "task",
+						"visible": true
+					},{
+						"label": "{{taskType}}",
+						"field": "taskType",
+						"visible": true
+					},{
+						"label": "{{responsible}}",
+						"field": "responsible",
+						"visible": true
+					},{
+						"label": "{{startDate}}",
+						"field": "startDate",
+						"visible": true
+					},{
+						"label": "{{endDate}}",
+						"field": "endDate",
+						"visible": true
+					}],
+					"taskTypes":[{
+						"key": "none",
+						"text": ""
+					},{
+						"key": "task",
+						"text": "{{task}}"
+					},{
+						"key": "bug",
+						"text": "{{bug}}"
+					},{
+						"key": "changeRequest",
+						"text": "{{changeRequest}}"
+					},{
+						"key": "story",
+						"text": "{{story}}"
+					}],
+					"data": [{
+						"task": "task",
+						"taskType": "taskType",
+						"responsible": "responsible",
+						"startDate": null,
+						"endDate": null
+					}],
+					"state":{ 
+						"edit": false
+					}
+				}
+			}
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "z.suek.app.view",
+				"controlId": "app",
+				"controlAggregation": "pages",
+				"bypassed": {
+					"target": "notFound"
+				},
+				"async": true
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "main",
+					"target": "main"
+				}
+			],
+			"targets": {
+				"main": {
+					"viewName": "Main",
+					"viewLevel": 1,
+					"viewId": "main"
+				},
+				"notFound": {
+					"viewName": "NotFound",
+					"viewId": "notFound"
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,112 @@
+[
+	{
+		"Guid": "1f707e91-0fef-4c88-ade1-65e932921a25",
+		"String": "Reprehenderit sint velit. Ipsum laboris.",
+		"Decimal": 721.1545343493204,
+		"Boolean": false,
+		"Int16": 399,
+		"Int32": 983,
+		"Date": "/Date(1598881925509)/",
+		"Time": "PT23H59M59S",
+		"Byte": 3
+	},
+	{
+		"Guid": "ecd40596-33eb-4192-b6f1-8a3ce393369a",
+		"String": "Lorem aliquip id pariatur.",
+		"Decimal": 817.7416623181464,
+		"Boolean": false,
+		"Int16": 314,
+		"Int32": 797,
+		"Date": "/Date(1598881925513)/",
+		"Time": "PT23H59M59S",
+		"Byte": 1
+	},
+	{
+		"Guid": "99739da1-0057-420c-83c7-b16abaf6bd89",
+		"String": "Mollit excepteur.",
+		"Decimal": 548.7391161872548,
+		"Boolean": false,
+		"Int16": 370,
+		"Int32": 809,
+		"Date": "/Date(1598881925516)/",
+		"Time": "PT23H59M59S",
+		"Byte": 3
+	},
+	{
+		"Guid": "421bf79f-945c-477a-a47e-57f3a7ace4b7",
+		"String": "Laboris nulla sunt duis. Aliqua anim.",
+		"Decimal": 260.9068616319499,
+		"Boolean": false,
+		"Int16": 551,
+		"Int32": 884,
+		"Date": "/Date(1598881925526)/",
+		"Time": "PT23H59M59S",
+		"Byte": 7
+	},
+	{
+		"Guid": "6874dfde-fecd-4f72-b857-9b29df14463a",
+		"String": "Labore qui id. Nostrud laborum officia.",
+		"Decimal": 378.8348593420006,
+		"Boolean": false,
+		"Int16": 935,
+		"Int32": 834,
+		"Date": "/Date(1598881925529)/",
+		"Time": "PT23H59M59S",
+		"Byte": 3
+	},
+	{
+		"Guid": "96c4d8ef-9491-471b-8b4f-8dab98ae64da",
+		"String": "Ullamco est. Velit ullamco eiusmod ad.",
+		"Decimal": 437.9986286196822,
+		"Boolean": false,
+		"Int16": 408,
+		"Int32": 118,
+		"Date": "/Date(1598881925535)/",
+		"Time": "PT23H59M59S",
+		"Byte": 1
+	},
+	{
+		"Guid": "56d1ba1d-2135-4155-9b1a-263d01d3cc2f",
+		"String": "Labore aliqua.",
+		"Decimal": 19.965244979051057,
+		"Boolean": false,
+		"Int16": 30,
+		"Int32": 327,
+		"Date": "/Date(1598881925538)/",
+		"Time": "PT23H59M59S",
+		"Byte": 3
+	},
+	{
+		"Guid": "f982162a-f1c0-4def-8a3f-f0d5842e56dd",
+		"String": "Ex velit deserunt. Minim nulla sit et.",
+		"Decimal": 158.5608373442404,
+		"Boolean": false,
+		"Int16": 881,
+		"Int32": 749,
+		"Date": "/Date(1598881925541)/",
+		"Time": "PT23H59M59S",
+		"Byte": 7
+	},
+	{
+		"Guid": "279c03d2-0dc1-443c-b097-e9193440e7be",
+		"String": "Eu dolor. Dolor laboris.",
+		"Decimal": 422.6660994858429,
+		"Boolean": false,
+		"Int16": 653,
+		"Int32": 573,
+		"Date": "/Date(1598881925546)/",
+		"Time": "PT23H59M59S",
+		"Byte": 1
+	},
+	{
+		"Guid": "9b21a764-5169-477f-87cb-9dbf84040b97",
+		"String": "Amet velit deserunt.",
+		"Decimal": 989.3406761181164,
+		"Boolean": false,
+		"Int16": 338,
+		"Int32": 137,
+		"Date": "/Date(1598881925550)/",
+		"Time": "PT23H59M59S",
+		"Byte": 1
+	}
+]

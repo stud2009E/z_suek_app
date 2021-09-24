@@ -1,0 +1,79 @@
+<mvc:View controllerName="z.suek.app.controller.Main"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:t="sap.ui.table"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns="sap.m"
+	displayBlock="true"
+	height="100%">
+
+    <Page showHeader="true"
+		title="{i18n>taskPageTitle}"
+		class="sapUiContentPadding">
+
+		<fb:FilterBar showClearButton="true"> 
+			<fb:filterGroupItems>
+				<fb:FilterGroupItem groupName="base"
+					name="task">
+					<fb:control>
+						<Input/>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem groupName="base"
+					name="taskType">
+					<fb:control>
+						<Select/>
+					</fb:control>
+				</fb:FilterGroupItem>
+			</fb:filterGroupItems>
+		</fb:FilterBar>
+
+		<t:Table id="taskTable"
+			columns="{
+				path:'column>/columns',
+				factory: '.columnFactory'
+			}"
+			rows="{
+				path: 'row>/data'
+			}">
+
+			<t:extension>
+				<Toolbar>
+					<Title text="{i18n>taskTableTitle}"/>
+					<ToolbarSpacer/>
+					<Button icon="sap-icon://add"
+						visible="{local>/state/edit}"
+						press="onCreateNewTask"/>
+					<Button icon="sap-icon://action-settings"
+						press="onSetupColumns"
+						visible="{= !${local>/state/edit}}"/>
+				</Toolbar>
+			</t:extension>
+		</t:Table>
+
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				
+				<Button text="{i18n>excel}"
+					visible="{= !${local>/state/edit}}"
+					press="onFomrExcelFile"
+				/>
+				<Button text="{i18n>edit}"
+					visible="{= !${local>/state/edit}}"
+					press="onEditTasks"
+				/>
+				<Button text="{i18n>cancel}"
+					visible="{local>/state/edit}"
+					press="onCancelTasks"
+				/>
+				<Button text="{i18n>save}"
+					visible="{local>/state/edit}"
+					press="onSaveTasks"
+				/>
+			</Toolbar>
+
+		</footer>
+    </Page>
+
+</mvc:View>

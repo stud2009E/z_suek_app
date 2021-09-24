@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData" Version="1.0">
+   <edmx:DataServices m:DataServiceVersion="2.0">
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" Namespace="CUSTOM_DATA_SRV" xml:lang="ru" sap:schema-version="1">
+         <EntityType Name="TestDataType" sap:label="test types" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="Guid" />
+            </Key>
+            <Property Name="Guid" Type="Edm.Guid" MaxLength="10" Nullable="false" sap:label="GUID" />
+            <Property Name="String" Type="Edm.String" MaxLength="10" Nullable="false" sap:label="String"/>
+            <Property Name="Decimal" Type="Edm.Decimal" MaxLength="10" Nullable="false" sap:label="Decimal"/>
+            <Property Name="Boolean" Type="Edm.Boolean" MaxLength="10" Nullable="false" sap:label="Boolean"/>
+            <Property Name="Int16" Type="Edm.Int16" MaxLength="10" Nullable="false" sap:label="Int16"/>
+            <Property Name="Int32" Type="Edm.Int32" MaxLength="10" Nullable="false" sap:label="Int32"/>
+            <Property Name="Date" Type="Edm.DateTime" MaxLength="10" Nullable="false" sap:label="Date"/>
+            <Property Name="Time" Type="Edm.Time" MaxLength="10" Nullable="false" sap:label="Time"/>
+            <Property Name="Byte" Type="Edm.Byte" MaxLength="10" Nullable="false" sap:label="Byte"/>
+         </EntityType>
+         <EntityContainer Name="CUSTOM_DATA_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+            <EntitySet Name="TestDataSet" EntityType="CUSTOM_DATA_SRV.TestDataType" sap:content-version="1" />
+         </EntityContainer>
+      </Schema>
+   </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <script id="sap-ui-bootstrap" 
+    src="/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_belize"
+    data-sap-ui-preload="async"
+    data-sap-ui-resourceroots='{
+      "z.suek.app": "../../"
+    }'
+    data-sap-ui-noConflict="true">
+  </script>
+
+  <link rel="stylesheet" href="/resources/sap/ui/thirdparty/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="/resources/sap/ui/thirdparty/qunit.js"></script>
+  <script type="text/javascript" src="/resources/sap/ui/qunit/qunit-junit.js"></script>
+  <script type="text/javascript" src="/resources/sap/ui/qunit/QUnitUtils.js"></script>
+
+  <script type="text/javascript" src="/resources/sap/ui/thirdparty/sinon.js"></script>
+  <script type="text/javascript" src="/resources/sap/ui/thirdparty/sinon-qunit.js"></script>
+
+  <script type="text/javascript">
+
+    QUnit.config.autostart = false;
+
+    sap.ui.getCore().attachInit(function(){
+      "use strict";
+      
+      sap.ui.require([
+        "z/suek/app/test/unit/allTests"
+      ], function(allTests){
+        QUnit.start();
+      });
+
+    });
+
+  </script>
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+  </body>
+</html>

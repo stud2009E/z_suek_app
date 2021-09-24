@@ -1,0 +1,25 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+
+    <Dialog title="{i18n>columnSetup}"
+        contentWidth="20rem"
+        contentHeight="30rem"
+        class="sapUiContentPadding">
+
+        <List items="{local>/columns}">
+            <CustomListItem>
+                <CheckBox selected="{local>visible}"
+                    text="{local>label}"
+                />
+            </CustomListItem>
+        </List>
+
+        <buttons>
+            <Button text="{i18n>apply}"
+                press="onColumnSettingsApply"
+            />
+        </buttons>
+    </Dialog>
+
+</core:FragmentDefinition>
