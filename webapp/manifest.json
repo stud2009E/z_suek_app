@@ -106,7 +106,7 @@
 						  "taskType": "bug",
 						  "responsible": "Ford Andrey",
 						  "startDate": "20211201",
-						  "endDate": null,
+						  "endDate": "20220410",
 						  "isNew": false,
 						  "taskTypeText": "Исправление бага"
 						},
@@ -114,8 +114,8 @@
 						  "task": "Не обновляется статус после согласования",
 						  "taskType": "bug",
 						  "responsible": "Johnson John",
-						  "startDate": null,
-						  "endDate": null,
+						  "startDate": "20211201",
+						  "endDate": "20220410",
 						  "isNew": false,
 						  "taskTypeText": "Исправление бага"
 						},
@@ -123,8 +123,8 @@
 						  "task": "Установить update 1.2 на сервер приложений",
 						  "taskType": "changeRequest",
 						  "responsible": "Ford Andrey",
-						  "startDate": null,
-						  "endDate": null,
+						  "startDate": "20211201",
+						  "endDate": "20220410",
 						  "taskTypeText": "Запрос на обслуживание"
 						}
 					  ],

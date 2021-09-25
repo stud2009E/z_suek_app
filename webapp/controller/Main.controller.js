@@ -31,6 +31,8 @@ sap.ui.define([
 
     var oModel = null;
     var oTable = null;
+    var oDateParse = null;
+    var oDateFormat = null;
 
     return BaseController.extend("z.suek.app.controller.Main", {
 
@@ -40,6 +42,13 @@ sap.ui.define([
 
             oModel = this.getModel("local");
             oTable = this.byId("taskTable");
+
+            oDateParse = DateFormat.getDateInstance({
+                pattern: "YYYYMMdd"
+            });
+            oDateFormat = DateFormat.getDateInstance({
+                pattern: "dd.MM.YYYY"
+            });
 
             oTable.setModel(oModel, "column");
             oTable.setModel(oModel, "row");
@@ -105,7 +114,7 @@ sap.ui.define([
                         if(oControl.getValue()){
                             oFilter = new Filter({
                                 path: sPath,
-                                operator: FilterOperator.LE,
+                                operator: FilterOperator.GE,
                                 value1: oControl.getValue()
                             });
                         }
@@ -114,7 +123,7 @@ sap.ui.define([
                         if(oControl.getValue()){
                             oFilter = new Filter({
                                 path: sPath,
-                                operator: FilterOperator.GE,
+                                operator: FilterOperator.LE,
                                 value1: oControl.getValue()
                             });
                         }
@@ -167,9 +176,9 @@ sap.ui.define([
         onCreateNewTask: function(){
             var oTask = {
                 task: "",
-                taskType: "none",
+                taskType: null,
                 responsible: "",
-                startDate: "",
+                startDate: oDateFormat.format(new Date()),
                 endDate: null,
                 isNew: true
             };
@@ -177,7 +186,7 @@ sap.ui.define([
             var aData = oModel.getProperty("/data");
             aData.splice(0, 0, oTask);
 
-            oModel.updateBindings();
+            oModel.updateBindings(true);
         },
 
         onEditTasks: function(){
@@ -192,7 +201,7 @@ sap.ui.define([
             oModel.setProperty("/state/edit", false);
             var aRows = oModel.getProperty("/data");
             aRows.forEach(function(oRow){
-                oRow.bNew = false;
+                delete oRow.bNew;
             });
         },
         
@@ -348,7 +357,15 @@ sap.ui.define([
                         valueFormat: "YYYYMMdd",
                         value: {
                             path:"row>" + sField
+                        },
+                        maxDate: {
+                            path: "row>endDate",
+                            formatter: function(sEndDate){
+                                if(!sEndDate) return null;
+                                return oDateParse.parse(sEndDate);
+                            }
                         }
+
                     });
                     oText = new Text({
                         visible: oReadVisibleBinding,
@@ -356,13 +373,6 @@ sap.ui.define([
                             path: "row>" + sField,
                             formatter: function(sDate){
                                 if(!sDate) return;
-                                var oDateParse = DateFormat.getDateInstance({
-                                    pattern: "YYYYMMdd"
-                                });
-                                var oDateFormat = DateFormat.getDateInstance({
-                                    pattern: "dd.MM.YYYY"
-                                });
-
                                 var oDate = oDateParse.parse(sDate);
                                 return oDateFormat.format(oDate);
                             }
@@ -376,6 +386,13 @@ sap.ui.define([
                         valueFormat: "YYYYMMdd",
                         value: {
                             path:"row>" + sField,
+                        },
+                        minDate: {
+                            path: "row>startDate",
+                            formatter: function(sStartDate){
+                                if(!sStartDate) return;
+                                return oDateParse.parse(sStartDate);
+                            }
                         }
                     });
                     oText = new Text({
@@ -383,13 +400,7 @@ sap.ui.define([
                         text: {
                             path: "row>" + sField,
                             formatter: function(sDate){
-                                if(!sDate) return;
-                                var oDateParse = DateFormat.getDateInstance({
-                                    pattern: "YYYYMMdd"
-                                });
-                                var oDateFormat = DateFormat.getDateInstance({
-                                    pattern: "dd.MM.YYYY"
-                                });
+                                if(!sDate) return null;
 
                                 var oDate = oDateParse.parse(sDate);
                                 return oDateFormat.format(oDate);
