@@ -11,7 +11,10 @@ sap.ui.define([
     "sap/m/ColumnListItem",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/core/format/DateFormat"
+    "sap/ui/core/format/DateFormat",
+    "sap/ui/model/type/String",
+    "sap/ui/export/Spreadsheet",
+    "sap/m/MessageBox"
 ], function (
     BaseController,
     Column,
@@ -25,7 +28,10 @@ sap.ui.define([
     ColumnListItem,
     Filter,
     FilterOperator,
-    DateFormat
+    DateFormat,
+    StringType,
+    Spreadsheet,
+    MessageBox
 ) {
     "use strict";
 
@@ -222,9 +228,19 @@ sap.ui.define([
         },
 
         onSaveTasks: function(){
-            var aRows = oModel.getProperty("/data");
+            var bHasError = false;
+            var oRowsBinding = oTable.getBinding("rows");
+            var aIndices = ( oRowsBinding.aIndices || [] );
 
+            aIndices.forEach(function(i){
+                var oRow = oTable.getRows()[i];
+            }); 
             
+            if(bHasError){
+                return;
+            }
+            
+            var aRows = oModel.getProperty("/data");
             aRows.forEach(function(oRow){
                 delete oRow.bNew;
             });
@@ -331,7 +347,12 @@ sap.ui.define([
             switch (sField) {
                 case "task":
                     oEditControl = new Input({
-                        value: "{row>" + sField + "}",
+                        value: {
+                            path: "row>" + sField,
+                            type: new StringType({
+                                minLength: 1
+                            })
+                        },
                         visible: oInputVisibleBinding
                     });
                     break;
@@ -364,7 +385,9 @@ sap.ui.define([
                         visible: oInputVisibleBinding,
                         showValueHelp: true,
 						valueHelpOnly: true,
-                        value: "{row>" + sField + "}",
+                        value: {
+                            path:"row>" + sField
+                        },
                         valueHelpRequest: this.onValueHelpResponsibleRequest.bind(this),
                         suggestionItems:{
                             path:"local>/persons",
@@ -383,15 +406,7 @@ sap.ui.define([
                         valueFormat: "YYYYMMdd",
                         value: {
                             path:"row>" + sField
-                        },
-                        maxDate: {
-                            path: "row>endDate",
-                            formatter: function(sEndDate){
-                                if(!sEndDate) return null;
-                                return oDateParse.parse(sEndDate);
-                            }
                         }
-
                     });
                     oText = new Text({
                         visible: oReadVisibleBinding,
@@ -412,13 +427,6 @@ sap.ui.define([
                         valueFormat: "YYYYMMdd",
                         value: {
                             path:"row>" + sField,
-                        },
-                        minDate: {
-                            path: "row>startDate",
-                            formatter: function(sStartDate){
-                                if(!sStartDate) return;
-                                return oDateParse.parse(sStartDate);
-                            }
                         }
                     });
                     oText = new Text({
@@ -441,6 +449,46 @@ sap.ui.define([
             return new VBox({
                 items: [oEditControl, oText]
             });
+        },
+
+
+        onFormExcelFile: function(){
+            var aData = null;
+            var aColumns = oModel.getProperty("/columns")
+                .map(function(oUIColumn){
+                    var oConfigColumn = {
+                        label: oUIColumn.label,
+                        property: oUIColumn.field,
+                        width: '50'
+                    };
+
+                    if(oConfigColumn.property === "taskType"){
+                        oConfigColumn.property += "Text";
+                    }
+
+                    return oConfigColumn;
+                });
+
+            aData = (oTable.getBinding("rows") || [])
+                .getContexts()
+                .map(function(oCtx){
+                    return $.extend({}, oCtx.getObject());
+                });
+            
+            if(aData.length === 0){
+                MessageBox.warning(this.getText("noData"))
+            }
+
+			var oSettings = {
+				workbook: { columns: aColumns },
+				dataSource: aData
+			};
+
+			var oSheet = new Spreadsheet(oSettings);
+			oSheet.build()
+				.finally(function() {
+					oSheet.destroy();
+				});
         }
 
     });

@@ -15,6 +15,7 @@
 		<core:Fragment fragmentName="z.suek.app.fragment.TaskFilterBar" type="XML"/>
 
 		<t:Table id="taskTable"
+			selectionMode="None"
 			columns="{
 				path:'column>/columns',
 				factory: '.columnFactory'
@@ -43,7 +44,7 @@
 				
 				<Button text="{i18n>excel}"
 					visible="{= !${local>/state/edit}}"
-					press="onFomrExcelFile"
+					press="onFormExcelFile"
 				/>
 				<Button text="{i18n>edit}"
 					visible="{= !${local>/state/edit}}"
