@@ -16,8 +16,8 @@
         </List>
 
         <buttons>
-            <Button text="{i18n>apply}"
-                press="onColumnSettingsApply"
+            <Button text="{i18n>close}"
+                press="onColumnSettingsClose"
             />
         </buttons>
     </Dialog>

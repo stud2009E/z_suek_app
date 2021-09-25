@@ -7,8 +7,11 @@ sap.ui.define([
     "sap/m/Select",
     "sap/m/DatePicker",
     "sap/ui/core/Item",
-    "sap/ui/model/type/Date",
-    "sap/m/VBox"
+    "sap/m/VBox",
+    "sap/m/ColumnListItem",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/core/format/DateFormat"
 ], function (
     BaseController,
     Column,
@@ -18,10 +21,16 @@ sap.ui.define([
     Select,
     DatePicker,
     Item,
-    DateType,
-    VBox
+    VBox,
+    ColumnListItem,
+    Filter,
+    FilterOperator,
+    DateFormat
 ) {
     "use strict";
+
+    var oModel = null;
+    var oTable = null;
 
     return BaseController.extend("z.suek.app.controller.Main", {
 
@@ -29,8 +38,8 @@ sap.ui.define([
 
             this.getRouter().getRoute("main").attachMatched(this._onRouteMatch, this);
 
-            var oModel = this.getModel("local");
-            var oTable = this.byId("taskTable");
+            oModel = this.getModel("local");
+            oTable = this.byId("taskTable");
 
             oTable.setModel(oModel, "column");
             oTable.setModel(oModel, "row");
@@ -42,7 +51,89 @@ sap.ui.define([
          */
         _onRouteMatch: function(oEvent){
 
+        },
 
+        onFBClear: function(oEvent){
+            var aSelectionSet = oEvent.getParameter("selectionSet");
+
+            aSelectionSet && aSelectionSet.forEach(function(oItem){
+                if(oItem.setValue){
+                    oItem.setValue(null);
+                }
+
+                if(oItem.setSelectedKey){
+                    oItem.setSelectedKey(null);
+                }
+            });
+        },
+
+        onFBReset: function(oEvent){
+            this.onFBClear(oEvent);
+            this.onFBSearch(oEvent);
+        },
+
+        onFBSearch: function(oEvent){
+            var oRowsBinding = oTable.getBinding("rows");
+            var oFilterBar = oEvent.getSource();
+            var aFilters = [];
+            var aFilterGroupItems = oFilterBar.getFilterGroupItems();
+            
+            aFilterGroupItems.forEach(function(oGroupItem){
+                var sPath = oGroupItem.getName();
+                var oControl = oGroupItem.getControl();
+                var oFilter = null;
+                switch (sPath) {
+                    case "taskType":
+                        if(oControl.getSelectedKey()){
+                            oFilter = new Filter({
+                                path: sPath,
+                                operator: FilterOperator.EQ,
+                                value1: oControl.getSelectedKey()
+                            });
+                        }
+                        break;
+                    case "responsible":
+                        if(oControl.getValue()){
+                            oFilter = new Filter({
+                                path: sPath,
+                                operator: FilterOperator.EQ,
+                                value1: oControl.getValue()
+                            });
+                        }
+                        break;
+                    case "startDate":
+                        if(oControl.getValue()){
+                            oFilter = new Filter({
+                                path: sPath,
+                                operator: FilterOperator.LE,
+                                value1: oControl.getValue()
+                            });
+                        }
+                        break;
+                    case "endDate":
+                        if(oControl.getValue()){
+                            oFilter = new Filter({
+                                path: sPath,
+                                operator: FilterOperator.GE,
+                                value1: oControl.getValue()
+                            });
+                        }
+                        break;
+                }
+                if(oFilter){
+                    aFilters.push(oFilter);
+                }
+            });
+
+            if(!oRowsBinding){
+                return;
+            }
+
+            if(aFilters.length > 0){
+                oRowsBinding.filter( aFilters);
+            }else{
+                oRowsBinding.filter(null);
+            }
         },
 
         onSetupColumns: function(){
@@ -68,19 +159,17 @@ sap.ui.define([
             }
         },
 
-        onColumnSettingsApply: function(oEvent){
+        onColumnSettingsClose: function(oEvent){
             var oDialog = oEvent.getSource().getParent();
             oDialog.close();
         },
 
         onCreateNewTask: function(){
-            var oModel = this.getModel("local");
-
             var oTask = {
                 task: "",
                 taskType: "none",
                 responsible: "",
-                startDate: new Date(),
+                startDate: "",
                 endDate: null,
                 isNew: true
             };
@@ -92,8 +181,6 @@ sap.ui.define([
         },
 
         onEditTasks: function(){
-            var oModel = this.getModel("local");
-            var oTable = this.byId("taskTable");
             oTable.getColumns().forEach(function(oColumn){
                 oColumn.setVisible(true);
             });
@@ -102,14 +189,78 @@ sap.ui.define([
         },
 
         onSaveTasks: function(){
-            var oModel = this.getModel("local");
             oModel.setProperty("/state/edit", false);
+            var aRows = oModel.getProperty("/data");
+            aRows.forEach(function(oRow){
+                oRow.bNew = false;
+            });
         },
         
 
+        onValueHelpResponsibleRequest: function(oEvent){
+            var oView = this.getView();
+            var oInput = oEvent.getSource();
+            
+            oView.setBusy(true);
+
+            Fragment.load({
+                name: "z.suek.app.fragment.ResponsibleUsersVH",
+                controller: this
+            })
+            .then(function(oValueHelp){
+                oView.addDependent(oValueHelp);
+
+                oValueHelp.data("input", oInput);
+
+                oValueHelp.attachAfterClose(function(){
+                    oValueHelp.destroy();
+                    oValueHelp = null;
+                });
+
+                oValueHelp.getTableAsync().then(function (oTable) {
+                    oTable.setModel(oModel);
+                    oTable.setModel(oModel, "columns");
+
+                    if(oTable.bindRows){
+                        oTable.bindAggregation("rows", {
+                            path:"/persons"
+                        });
+                    }
+
+                    if(oTable.bindItems){
+                        oTable.bindAggregation("items",{
+                            path: "/persons", 
+                            factory: function () {
+                                return new ColumnListItem({
+                                    cells: [
+                                        new Text({ text:"{name}"})
+                                    ]
+                                });
+                            }
+                        });
+                    }
+                    oValueHelp.update();
+                }.bind(this));
+
+                oValueHelp.open();
+            }.bind(this))
+            .finally(function(){
+                oView.setBusy(false);
+            });
+        },
+
+        onValueHelpOkPress: function(oEvent){
+            var oValueHelp = oEvent.getSource();
+            var oInput = oValueHelp.data("input");
+            var aTokens = oEvent.getParameter("tokens");
+            
+			oInput.setValue(aTokens[0].getText());
+
+			oValueHelp.close();
+        },
+
         columnFactory: function(sId, oColumnCtx){
             var sLabel = oColumnCtx.getProperty("label");
-
             var oControl = this.templateFactory(oColumnCtx);
 
             return new Column(sId, {
@@ -125,14 +276,14 @@ sap.ui.define([
 
             var oReadVisibleBinding = {
                 path: "local>/state/edit",
-                formatter: function(bNew, bEdit){
-                    return !(!!bNew || !!bEdit) 
+                formatter: function(bEdit){
+                    return !bEdit; 
                 }
             };
             var oInputVisibleBinding = {
                 path: "local>/state/edit",
-                formatter: function(bNew, bEdit){
-                    return !!(bNew || bEdit); 
+                formatter: function(bEdit){
+                    return bEdit; 
                 }
             };
 
@@ -176,52 +327,73 @@ sap.ui.define([
                 case "responsible":
                     oEditControl = new Input({
                         visible: oInputVisibleBinding,
-                        value: "{row>" + sField + "}"
+                        showValueHelp: true,
+						valueHelpOnly: true,
+                        value: "{row>" + sField + "}",
+                        valueHelpRequest: this.onValueHelpResponsibleRequest.bind(this),
+                        suggestionItems:{
+                            path:"local>/persons",
+                            templateShareable:true,
+							template: new Item({
+                                key:"{local>id}",
+                                text:"{local>name}"
+                            })
+                        }
                     });
                     break;
                 case "startDate":
                     oEditControl = new DatePicker({
                         visible: oInputVisibleBinding,
+                        displayFormat: "dd.MM.YYYY",
+                        valueFormat: "YYYYMMdd",
                         value: {
-                            path:"row>" + sField,
-                            type: new DateType({
-                                format: "YYYYMMdd"
-                            })
-                        },
-                        maxDate: {
-                            path:"row>endDate"
+                            path:"row>" + sField
                         }
                     });
                     oText = new Text({
                         visible: oReadVisibleBinding,
                         text: {
                             path: "row>" + sField,
-                            type: new DateType({
-                                format: "YYYYMMdd"
-                            })
+                            formatter: function(sDate){
+                                if(!sDate) return;
+                                var oDateParse = DateFormat.getDateInstance({
+                                    pattern: "YYYYMMdd"
+                                });
+                                var oDateFormat = DateFormat.getDateInstance({
+                                    pattern: "dd.MM.YYYY"
+                                });
+
+                                var oDate = oDateParse.parse(sDate);
+                                return oDateFormat.format(oDate);
+                            }
                         } 
                     });
                     break;
                 case "endDate":
                     oEditControl = new DatePicker({
                         visible: oInputVisibleBinding,
+                        displayFormat: "dd.MM.YYYY",
+                        valueFormat: "YYYYMMdd",
                         value: {
                             path:"row>" + sField,
-                            type: new DateType({
-                                format: "YYYYMMdd"
-                            })
-                        },
-                        minDate: {
-                            path:"row>startDate"
                         }
                     });
                     oText = new Text({
                         visible: oReadVisibleBinding,
                         text: {
                             path: "row>" + sField,
-                            type: new DateType({
-                                format: "YYYYMMdd"
-                            })
+                            formatter: function(sDate){
+                                if(!sDate) return;
+                                var oDateParse = DateFormat.getDateInstance({
+                                    pattern: "YYYYMMdd"
+                                });
+                                var oDateFormat = DateFormat.getDateInstance({
+                                    pattern: "dd.MM.YYYY"
+                                });
+
+                                var oDate = oDateParse.parse(sDate);
+                                return oDateFormat.format(oDate);
+                            }
                         } 
                     });
                     break;

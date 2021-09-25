@@ -1,0 +1,13 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:core="sap.ui.core">
+
+    <ValueHelpDialog
+		title="{i18n>users}"
+		ok=".onValueHelpOkPress"
+		cancel=".onValueHelpCancelPress"
+		supportMultiselect="false"
+		key="id"
+		descriptionKey="name"/>
+
+</core:FragmentDefinition>

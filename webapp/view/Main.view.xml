@@ -11,18 +11,67 @@
 		title="{i18n>taskPageTitle}"
 		class="sapUiContentPadding">
 
-		<fb:FilterBar showClearButton="true"> 
+		<fb:FilterBar 
+			showFilterConfiguration="false"
+			showClearButton="true"
+			showClearOnFB="true"
+			showRestoreOnFB="true"
+			clear="onFBClear"
+			reset="onFBReset"
+			search="onFBSearch"
+			useToolbar="false"> 
 			<fb:filterGroupItems>
 				<fb:FilterGroupItem groupName="base"
-					name="task">
+					visibleInFilterBar="true"
+					label="{i18n>taskType}"
+					name="taskType">
 					<fb:control>
-						<Input/>
+						<Select items="{local>/taskTypes}">
+							<core:Item
+								key="{local>key}"
+								text="{local>text}"
+							/>
+						</Select>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem groupName="base"
-					name="taskType">
+					visibleInFilterBar="true"
+					label="{i18n>responsible}"
+					name="responsible">
 					<fb:control>
-						<Select/>
+						<Input showValueHelp="true"
+							valueHelpOnly="true"
+							suggestionItems="{
+								path:'local>/persons',
+								templateShareable:true
+							}"
+							valueHelpRequest=".onValueHelpResponsibleRequest">
+							<suggestionItems>
+								<core:Item key="{local>id}"
+									text="{local>name}"
+								/>
+							</suggestionItems>
+						</Input>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem groupName="base"
+					visibleInFilterBar="true"
+					label="{i18n>startDate}"
+					name="startDate">
+					<fb:control>
+						<DatePicker 
+							displayFormat="dd.MM.YYYY"
+                        	valueFormat="YYYYMMdd"/>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem groupName="base"
+					visibleInFilterBar="true"
+					label="{i18n>endDate}"
+					name="endDate">
+					<fb:control>
+						<DatePicker 
+							displayFormat="dd.MM.YYYY"
+                        	valueFormat="YYYYMMdd"/>
 					</fb:control>
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>

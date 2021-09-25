@@ -64,7 +64,7 @@
 				"type": "sap.ui.model.json.JSONModel",
 				"settings":{
 					"columns":[{
-						"label": "{{task}}",
+						"label": "{{taskName}}",
 						"field": "task",
 						"visible": true
 					},{
@@ -85,7 +85,7 @@
 						"visible": true
 					}],
 					"taskTypes":[{
-						"key": "none",
+						"key": null,
 						"text": ""
 					},{
 						"key": "task",
@@ -100,16 +100,49 @@
 						"key": "story",
 						"text": "{{story}}"
 					}],
-					"data": [{
-						"task": "task",
-						"taskType": "taskType",
-						"responsible": "responsible",
-						"startDate": null,
-						"endDate": null
-					}],
+					"data": [
+						{
+						  "task": "Некорректно производится расчет для",
+						  "taskType": "bug",
+						  "responsible": "Ford Andrey",
+						  "startDate": "20211201",
+						  "endDate": null,
+						  "isNew": false,
+						  "taskTypeText": "Исправление бага"
+						},
+						{
+						  "task": "Не обновляется статус после согласования",
+						  "taskType": "bug",
+						  "responsible": "Johnson John",
+						  "startDate": null,
+						  "endDate": null,
+						  "isNew": false,
+						  "taskTypeText": "Исправление бага"
+						},
+						{
+						  "task": "Установить update 1.2 на сервер приложений",
+						  "taskType": "changeRequest",
+						  "responsible": "Ford Andrey",
+						  "startDate": null,
+						  "endDate": null,
+						  "taskTypeText": "Запрос на обслуживание"
+						}
+					  ],
 					"state":{ 
 						"edit": false
-					}
+					},
+					"persons": [{
+						"name": "Johnson John"
+					},{
+						"name": "Ivanov Ivan"
+					},{
+						"name": "Smith Tom"
+					},{
+						"name": "Ford Andrey"
+					}],
+					"cols":[{
+						"template": "name"
+					}]
 				}
 			}
 		},
