@@ -141,6 +141,7 @@
 						"name": "Ford Andrey"
 					}],
 					"cols":[{
+						"label":"{{name}}",
 						"template": "name"
 					}]
 				}
@@ -160,7 +161,7 @@
 			},
 			"routes": [
 				{
-					"pattern": "",
+					"pattern": "/:?query:",
 					"name": "main",
 					"target": "main"
 				}

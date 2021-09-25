@@ -59,8 +59,32 @@ sap.ui.define([
          * @param {sap.ui.base.Event} oEvent 
          */
         _onRouteMatch: function(oEvent){
+            var oArgs = oEvent.getParameter("arguments");
+            var oQuery = oArgs["?query"];
 
+            if(!oQuery || !oQuery.state){
+                this.setMode("read");
+                return;
+            }
+
+            if(oQuery.state === "edit"){
+                oModel.setProperty("/state/edit", true);
+            }else if(oQuery.state === "read"){
+                oModel.setProperty("/state/edit", false);
+            }else{
+                this.setMode("read");
+            }
         },
+
+
+        setMode: function(sMode){
+            this.getRouter().navTo("main",{
+                query:{
+                    state: sMode
+                }
+            }, true);
+        },
+
 
         onFBClear: function(oEvent){
             var aSelectionSet = oEvent.getParameter("selectionSet");
@@ -194,15 +218,17 @@ sap.ui.define([
                 oColumn.setVisible(true);
             });
 
-            oModel.setProperty("/state/edit", true);
+            this.setMode("edit");
         },
 
         onSaveTasks: function(){
-            oModel.setProperty("/state/edit", false);
             var aRows = oModel.getProperty("/data");
+
+            
             aRows.forEach(function(oRow){
                 delete oRow.bNew;
             });
+            this.setMode("read");
         },
         
 
@@ -218,7 +244,7 @@ sap.ui.define([
             })
             .then(function(oValueHelp){
                 oView.addDependent(oValueHelp);
-
+                oValueHelp.addStyleClass("sapUiSizeCompact");
                 oValueHelp.data("input", oInput);
 
                 oValueHelp.attachAfterClose(function(){
