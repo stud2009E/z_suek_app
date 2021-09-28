@@ -1,6 +1,6 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/table/Column",
+    "sap/m/Column",
     "sap/m/Text",
     "sap/ui/core/Fragment",
     "sap/m/Input",
@@ -12,9 +12,9 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/core/format/DateFormat",
-    "sap/ui/model/type/String",
     "sap/ui/export/Spreadsheet",
-    "sap/m/MessageBox"
+    "sap/ui/core/ValueState",
+    "sap/ui/core/CustomData"
 ], function (
     BaseController,
     Column,
@@ -29,9 +29,9 @@ sap.ui.define([
     Filter,
     FilterOperator,
     DateFormat,
-    StringType,
     Spreadsheet,
-    MessageBox
+    ValueState,
+    CustomData
 ) {
     "use strict";
 
@@ -43,7 +43,6 @@ sap.ui.define([
     return BaseController.extend("z.suek.app.controller.Main", {
 
         onInit : function () {
-
             this.getRouter().getRoute("main").attachMatched(this._onRouteMatch, this);
 
             oModel = this.getModel("local");
@@ -75,13 +74,14 @@ sap.ui.define([
 
             if(oQuery.state === "edit"){
                 oModel.setProperty("/state/edit", true);
+                this._aDataCopy = JSON.parse(JSON.stringify(oModel.getProperty("/data")));
             }else if(oQuery.state === "read"){
                 oModel.setProperty("/state/edit", false);
+                this._aDataCopy = null;
             }else{
                 this.setMode("read");
             }
         },
-
 
         setMode: function(sMode){
             this.getRouter().navTo("main",{
@@ -90,7 +90,6 @@ sap.ui.define([
                 }
             }, true);
         },
-
 
         onFBClear: function(oEvent){
             var aSelectionSet = oEvent.getParameter("selectionSet");
@@ -112,7 +111,7 @@ sap.ui.define([
         },
 
         onFBSearch: function(oEvent){
-            var oRowsBinding = oTable.getBinding("rows");
+            var oRowsBinding = oTable.getBinding("items");
             var oFilterBar = oEvent.getSource();
             var aFilters = [];
             var aFilterGroupItems = oFilterBar.getFilterGroupItems();
@@ -171,7 +170,7 @@ sap.ui.define([
             if(aFilters.length > 0){
                 oRowsBinding.filter( aFilters);
             }else{
-                oRowsBinding.filter(null);
+                oRowsBinding.filter([]);
             }
         },
 
@@ -220,6 +219,9 @@ sap.ui.define([
         },
 
         onEditTasks: function(){
+            var oBinding = oTable.getBinding("items");
+            oBinding && oBinding.filter([]);
+
             oTable.getColumns().forEach(function(oColumn){
                 oColumn.setVisible(true);
             });
@@ -229,24 +231,32 @@ sap.ui.define([
 
         onSaveTasks: function(){
             var bHasError = false;
-            var oRowsBinding = oTable.getBinding("rows");
-            var aIndices = ( oRowsBinding.aIndices || [] );
+            var aItems = oTable.getItems();
 
-            aIndices.forEach(function(i){
-                var oRow = oTable.getRows()[i];
-            }); 
+            aItems.forEach(function(oItem){
+                oItem.getCells().forEach(function(oVBox){
+                    if(!oVBox.data("value")){
+                        oVBox.getItems()[0].setValueState(ValueState.Error);
+                        bHasError = true;
+                    }
+                });
+            });
             
             if(bHasError){
                 return;
             }
             
-            var aRows = oModel.getProperty("/data");
-            aRows.forEach(function(oRow){
-                delete oRow.bNew;
-            });
             this.setMode("read");
         },
         
+        onCancelTasksEdit: function(){
+            if(this._aDataCopy){
+                oModel.setProperty("/data", this._aDataCopy);
+                oModel.updateBindings();
+            }
+
+            this.setMode("read");
+        },
 
         onValueHelpResponsibleRequest: function(oEvent){
             var oView = this.getView();
@@ -306,24 +316,43 @@ sap.ui.define([
             var aTokens = oEvent.getParameter("tokens");
             
 			oInput.setValue(aTokens[0].getText());
+            oInput.fireChange({
+                value: aTokens[0].getText()
+            });
 
 			oValueHelp.close();
         },
 
-        columnFactory: function(sId, oColumnCtx){
-            var sLabel = oColumnCtx.getProperty("label");
-            var oControl = this.templateFactory(oColumnCtx);
+        onValueHelpCancelPress: function(oEvent){
+            var oValueHelp = oEvent.getSource();
+            oValueHelp.close();
+        },
 
+        columnFactory: function(sId){
             return new Column(sId, {
                 visible: "{column>visible}",
-                label: sLabel,
-                template: oControl
+                header: new Text({
+                    text: "{column>label}"
+                })
             });
         },
 
+        columnListItemFactory: function(sId, oRowCtx){
+            var that = this;
+            var oCli = new ColumnListItem();
 
-        templateFactory: function(oColumnCtx){
-            var sField = oColumnCtx.getProperty("field");
+            oCli.bindAggregation("cells", {
+                path: "column>/columns",
+                factory: function(sId, oClmnCtx){
+                    return that.cellFactory(oClmnCtx, oRowCtx);
+                }
+            })
+
+            return oCli;
+        },
+
+        cellFactory: function(oClmnCtx, oRowCtx){
+            var sField = oClmnCtx.getProperty("field");
 
             var oReadVisibleBinding = {
                 path: "local>/state/edit",
@@ -347,15 +376,17 @@ sap.ui.define([
             switch (sField) {
                 case "task":
                     oEditControl = new Input({
+                        change: function(oEvent){
+                            var sValueState = this.getValue() ? ValueState.None : ValueState.Error; 
+                            this.setValueState(sValueState);
+                        },
                         value: {
-                            path: "row>" + sField,
-                            type: new StringType({
-                                minLength: 1
-                            })
+                            path: "row>" + sField
                         },
                         visible: oInputVisibleBinding
                     });
                     break;
+
                 case "taskType":
                     oEditControl = new Select({
                         visible: oInputVisibleBinding,
@@ -363,8 +394,10 @@ sap.ui.define([
                         change: function(oEvent){
                             var oItem = oEvent.getParameter("selectedItem");
                             var oCtx = this.getBindingContext("row");
-                            var oModel = oCtx.getModel();
-                            oModel.setProperty(oCtx.getPath("taskTypeText"), oItem.getText())
+                            var sValueState = this.getSelectedKey() ? ValueState.None : ValueState.Error; 
+                            
+                            oModel.setProperty(oCtx.getPath("taskTypeText"), oItem.getText());
+                            this.setValueState(sValueState);
                         },
                         items: {
                             templateShareable: true,
@@ -380,6 +413,7 @@ sap.ui.define([
                         text: "{row>" + sField + "Text}"
                     });
                     break;
+
                 case "responsible":
                     oEditControl = new Input({
                         visible: oInputVisibleBinding,
@@ -387,6 +421,10 @@ sap.ui.define([
 						valueHelpOnly: true,
                         value: {
                             path:"row>" + sField
+                        },
+                        change: function(oEvent){
+                            var sValueState = this.getValue() ? ValueState.None : ValueState.Error; 
+                            this.setValueState(sValueState);
                         },
                         valueHelpRequest: this.onValueHelpResponsibleRequest.bind(this),
                         suggestionItems:{
@@ -399,14 +437,21 @@ sap.ui.define([
                         }
                     });
                     break;
+                    
+                case "endDate":
                 case "startDate":
                     oEditControl = new DatePicker({
                         visible: oInputVisibleBinding,
                         displayFormat: "dd.MM.YYYY",
                         valueFormat: "YYYYMMdd",
+                        change: function(oEvent){
+                            var sValueState = this.getValue() ? ValueState.None : ValueState.Error;
+                            this.setValueState(sValueState);
+                        },
                         value: {
                             path:"row>" + sField
                         }
+                        
                     });
                     oText = new Text({
                         visible: oReadVisibleBinding,
@@ -420,40 +465,25 @@ sap.ui.define([
                         } 
                     });
                     break;
-                case "endDate":
-                    oEditControl = new DatePicker({
-                        visible: oInputVisibleBinding,
-                        displayFormat: "dd.MM.YYYY",
-                        valueFormat: "YYYYMMdd",
-                        value: {
-                            path:"row>" + sField,
-                        }
-                    });
-                    oText = new Text({
-                        visible: oReadVisibleBinding,
-                        text: {
-                            path: "row>" + sField,
-                            formatter: function(sDate){
-                                if(!sDate) return null;
-
-                                var oDate = oDateParse.parse(sDate);
-                                return oDateFormat.format(oDate);
-                            }
-                        } 
-                    });
-                    break;
             }
-
             oText.setWrapping(false);
 
-            return new VBox({
+            var oVBox = new VBox({
                 items: [oEditControl, oText]
             });
+
+            oVBox.addCustomData(new CustomData({
+                key: "value",
+                value: {
+                    path: "row>" + sField
+                }
+            }));
+
+            return oVBox;
         },
 
 
         onFormExcelFile: function(){
-            var aData = null;
             var aColumns = oModel.getProperty("/columns")
                 .map(function(oUIColumn){
                     var oConfigColumn = {
@@ -469,15 +499,11 @@ sap.ui.define([
                     return oConfigColumn;
                 });
 
-            aData = (oTable.getBinding("rows") || [])
+            var aData = (oTable.getBinding("items") || [])
                 .getContexts()
                 .map(function(oCtx){
                     return $.extend({}, oCtx.getObject());
                 });
-            
-            if(aData.length === 0){
-                MessageBox.warning(this.getText("noData"))
-            }
 
 			var oSettings = {
 				workbook: { columns: aColumns },

@@ -14,17 +14,18 @@
 		
 		<core:Fragment fragmentName="z.suek.app.fragment.TaskFilterBar" type="XML"/>
 
-		<t:Table id="taskTable"
+		<Table id="taskTable"
 			selectionMode="None"
 			columns="{
 				path:'column>/columns',
 				factory: '.columnFactory'
 			}"
-			rows="{
-				path: 'row>/data'
+			items="{
+				path: 'row>/data',
+				factory: '.columnListItemFactory'
 			}">
 
-			<t:extension>
+			<headerToolbar>
 				<Toolbar>
 					<Title text="{i18n>taskTableTitle}"/>
 					<ToolbarSpacer/>
@@ -35,8 +36,8 @@
 						press="onSetupColumns"
 						visible="{= !${local>/state/edit}}"/>
 				</Toolbar>
-			</t:extension>
-		</t:Table>
+			</headerToolbar>
+		</Table>
 
 		<footer>
 			<Toolbar>
@@ -52,7 +53,7 @@
 				/>
 				<Button text="{i18n>cancel}"
 					visible="{local>/state/edit}"
-					press="onCancelTasks"
+					press="onCancelTasksEdit"
 				/>
 				<Button text="{i18n>save}"
 					visible="{local>/state/edit}"

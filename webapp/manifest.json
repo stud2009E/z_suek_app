@@ -8,6 +8,16 @@
 		"description": "{{appDescription}}",
 		"applicationVersion": {
 			"version": "1.0.0"
+		},
+		"dataSources": {
+			"odata": {
+				"uri": "/sap/opu/odata/sap/CUSTOM_DATA_SRV/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0",
+					"localUri": "localService/metadata.xml"
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -62,6 +72,13 @@
 					"bundleName": "z.suek.app.i18n.i18n"
 				}
 			},
+			"": {
+				"dataSource": "odata",
+				"settings": {
+					"defaultCountMode": "Inline"
+				}
+			},
+			
 			"local": {
 				"type": "sap.ui.model.json.JSONModel",
 				"settings":{
