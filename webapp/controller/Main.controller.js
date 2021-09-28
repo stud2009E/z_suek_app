@@ -233,13 +233,43 @@ sap.ui.define([
             var bHasError = false;
             var aItems = oTable.getItems();
 
+            function isDateValid(sDate){
+                return oDateFormat.parse(sDate) !== null;
+            }
+
             aItems.forEach(function(oItem){
+                var oStartDate = null;
+                var oEndDate = null;
                 oItem.getCells().forEach(function(oVBox){
+                    var oEditControl = oVBox.getItems()[0];
                     if(!oVBox.data("value")){
-                        oVBox.getItems()[0].setValueState(ValueState.Error);
+                        oEditControl.setValueState(ValueState.Error);
                         bHasError = true;
                     }
+
+                    if(oEditControl.data("datePicker") === "startDate"){
+                        oStartDate = oEditControl;
+                    }
+                    if(oEditControl.data("datePicker") === "endDate"){
+                        oEndDate = oEditControl;
+                    }
                 });
+                
+                if(!isDateValid(oStartDate.getValue())){
+                    oStartDate.setValueState(ValueState.Error);
+                        bHasError = true;
+                }
+                if(!isDateValid(oEndDate.getValue())){
+                    oEndDate.setValueState(ValueState.Error);
+                        bHasError = true;
+                }
+
+                if(oStartDate.getDateValue() && oEndDate.getDateValue()){
+                    if(oStartDate.getDateValue().getTime() > oEndDate.getDateValue().getTime()){
+                        oEndDate.setValueState(ValueState.Error);
+                        bHasError = true;
+                    }
+                }
             });
             
             if(bHasError){
@@ -453,6 +483,7 @@ sap.ui.define([
                         }
                         
                     });
+                    oEditControl.data("datePicker", sField);
                     oText = new Text({
                         visible: oReadVisibleBinding,
                         text: {

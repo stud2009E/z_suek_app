@@ -124,8 +124,8 @@
 						  "task": "Некорректно производится расчет для",
 						  "taskType": "bug",
 						  "responsible": "Ford Andrey",
-						  "startDate": "20211201",
-						  "endDate": "20220410",
+						  "startDate": "20210901",
+						  "endDate": "20211001",
 						  "isNew": false,
 						  "taskTypeText": "Исправление бага"
 						},
@@ -133,8 +133,8 @@
 						  "task": "Не обновляется статус после согласования",
 						  "taskType": "bug",
 						  "responsible": "Johnson John",
-						  "startDate": "20211201",
-						  "endDate": "20220410",
+						  "startDate": "20210901",
+						  "endDate": "20211001",
 						  "isNew": false,
 						  "taskTypeText": "Исправление бага"
 						},
@@ -142,8 +142,8 @@
 						  "task": "Установить update 1.2 на сервер приложений",
 						  "taskType": "changeRequest",
 						  "responsible": "Ford Andrey",
-						  "startDate": "20211201",
-						  "endDate": "20220410",
+						  "startDate": "20210901",
+						  "endDate": "20211001",
 						  "taskTypeText": "Запрос на обслуживание"
 						}
 					  ],
